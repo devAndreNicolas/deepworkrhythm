@@ -15,7 +15,7 @@ const modes = [
   { id: 'goal', label: 'Single goal', hint: 'One thing at a time' },
 ] as const
 
-const durations = [30, 40, 60] as const
+const durations = [25, 30, 40, 60] as const
 type Mode = (typeof modes)[number]['id']
 
 function formatTime(total: number) {

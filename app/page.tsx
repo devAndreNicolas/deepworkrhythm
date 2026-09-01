@@ -87,7 +87,7 @@ export default function Page() {
     <main className="min-h-screen px-5 py-6 text-foreground md:px-10 lg:px-16">
       <div className="mx-auto flex max-w-[1380px] flex-col gap-10">
         <header className="flex items-start justify-between">
-          <div className="flex items-center gap-3"><div className="logo-mark" aria-hidden="true"><span /><span /><span /></div><div><p className="font-mono text-[11px] uppercase tracking-[0.24em] text-primary">deep work / 01</p><h1 className="font-serif text-2xl tracking-tight">Focus.</h1></div></div>
+          <div className="flex items-center gap-3"><div className="logo-mark" aria-hidden="true"><span /><span /><span /></div><div><p className="font-mono text-[11px] uppercase tracking-[0.24em] text-primary">deepworkrhythm / 01</p><h1 className="font-serif text-2xl tracking-tight">Focus.</h1></div></div>
           <div className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground"><span className="status-dot" /> calm environment <Wind data-icon="inline-start" /></div>
         </header>
 

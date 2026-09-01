@@ -1,10 +1,15 @@
 import { Analytics } from '@vercel/analytics/next'
+import { DM_Sans, Fraunces, IBM_Plex_Mono } from 'next/font/google'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
+const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
+const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces' })
+const plexMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-plex-mono' })
+
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'Foco. — Deep Work',
+  description: 'Um espaço calmo para o trabalho que importa.',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -39,8 +44,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="pt-BR" className="bg-background">
+      <body className={`${dmSans.variable} ${fraunces.variable} ${plexMono.variable} antialiased`}>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

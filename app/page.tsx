@@ -18,7 +18,7 @@ import {
 } from 'lucide-react'
 
 const sounds = [
-  { id: 'soft', name: 'Soft tick', detail: 'suave e discreto', tone: 420 },
+  { id: 'soft', name: 'Clock click', detail: 'clique de cronômetro', tone: 1500 },
   { id: 'wood', name: 'Wood block', detail: 'seco e orgânico', tone: 220 },
   { id: 'drop', name: 'Water drop', detail: 'claro e leve', tone: 680 },
 ] as const
@@ -64,10 +64,11 @@ export default function Page() {
     oscillator.type = selectedSound.id === 'wood' ? 'triangle' : selectedSound.id === 'drop' ? 'sine' : 'square'
     oscillator.frequency.value = selectedSound.tone
     gain.gain.setValueAtTime(Math.min(volume / 1000, 0.08), context.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + (selectedSound.id === 'drop' ? 0.22 : 0.08))
+    const decay = selectedSound.id === 'drop' ? 0.22 : selectedSound.id === 'soft' ? 0.035 : 0.08
+    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + decay)
     oscillator.connect(gain).connect(context.destination)
     oscillator.start()
-    oscillator.stop(context.currentTime + 0.25)
+    oscillator.stop(context.currentTime + Math.max(decay, 0.06))
   }, [selectedSound, soundOn, volume])
 
   useEffect(() => {

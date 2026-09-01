@@ -8,8 +8,8 @@ const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces' })
 const plexMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-plex-mono' })
 
 export const metadata: Metadata = {
-  title: 'Foco. — Deep Work',
-  description: 'Um espaço calmo para o trabalho que importa.',
+  title: 'Focus. — Deep Work',
+  description: 'A quiet space for the work that matters.',
   generator: 'v0.app',
   icons: {
     icon: [

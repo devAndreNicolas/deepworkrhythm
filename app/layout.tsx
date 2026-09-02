@@ -45,7 +45,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR" className="bg-background">
+    <html lang="en" className="bg-background">
+      <head>
+        <meta name="59c420990088ffb516275a1265a6691d7f3c625b" content="59c420990088ffb516275a1265a6691d7f3c625b" />
+      </head>
       <body className={`${dmSans.variable} ${fraunces.variable} ${plexMono.variable} antialiased`}>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}

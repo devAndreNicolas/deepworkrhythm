@@ -17,6 +17,7 @@ button, input { font: inherit; }
 button { cursor: pointer; }
 
 .sketch-panel, .spotify-card { position: relative; border: 1px solid var(--border); border-radius: 9px 5px 11px 6px; background: color-mix(in oklch, var(--card) 88%, transparent); box-shadow: 3px 3px 0 oklch(.25 .03 140 / .45); }
+.ad-zone { min-height: 90px; display: flex; align-items: center; justify-content: center; gap: .75rem; border-top: 1px dashed var(--border); border-bottom: 1px dashed var(--border); color: var(--muted-foreground); }
 .sketch-panel::after, .spotify-card::after { content: ''; pointer-events: none; position: absolute; inset: 4px; border: 1px dashed oklch(.5 .05 140 / .13); border-radius: inherit; }
 .hero-panel { background: linear-gradient(135deg, color-mix(in oklch, var(--card) 94%, transparent), color-mix(in oklch, var(--background) 30%, var(--card))); }
 .logo-mark { display: flex; gap: 3px; align-items: end; height: 25px; transform: rotate(-8deg); }

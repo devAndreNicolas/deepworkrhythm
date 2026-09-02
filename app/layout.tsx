@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: 'Focus. — Deep Work',
   description: 'A quiet space for the work that matters.',
   generator: 'v0.app',
+  referrer: 'no-referrer-when-downgrade',
   icons: {
     icon: [
       {

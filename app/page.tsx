@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import Script from 'next/script'
 import { ArrowRight, Check, ChevronDown, ExternalLink, Headphones, Pause, Play, RotateCcw, Volume2, VolumeX, Wind, X } from 'lucide-react'
 
 const sounds = [
@@ -21,6 +20,17 @@ type Mode = (typeof modes)[number]['id']
 
 function formatTime(total: number) {
   return `${Math.floor(total / 60).toString().padStart(2, '0')}:${(total % 60).toString().padStart(2, '0')}`
+}
+
+function HilltopAdZone() {
+  if (process.env.NODE_ENV !== 'production') return <div className="ad-slot" aria-hidden="true" />
+
+  const adDocument = `<!doctype html><html><head><style>html,body{margin:0;min-height:90px;background:transparent;overflow:hidden}body{display:flex;align-items:center;justify-content:center}</style></head><body><script>(function(wjsu){
+var d=document,s=d.createElement('script'),l=d.scripts[d.scripts.length-1];
+s.settings=wjsu||{};s.src='//unfoldedtrade.com/bQX.VvsYdnGYlQ0nY/WUcx/AeLmF9cumZjU/lSkfPaTrc/z/N/zVcvzJMpjdEPtONUzxMy3GNgzuMuy/NIQE';s.async=true;s.referrerPolicy='no-referrer-when-downgrade';l.parentNode.insertBefore(s,l);
+})({})</script></body></html>`
+
+  return <iframe className="ad-slot" srcDoc={adDocument} title="Advertisement" loading="lazy" scrolling="no" />
 }
 
 export default function Page() {
@@ -106,16 +116,7 @@ export default function Page() {
             <div className="flex items-end justify-between border-t border-border/70 pt-5"><div><p className="eyebrow">progress</p><div className="mt-2 h-1.5 w-48 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${progress}%` }} /></div></div><p className="font-mono text-xs text-muted-foreground">{Math.round(progress)}% complete</p></div>
           </div>
 
-          <aside className="flex flex-col gap-6"><div><p className="eyebrow">session length</p><div className="mt-4 grid grid-cols-3 gap-2">{durations.map((minutes) => <button key={minutes} className={`mode-option justify-center ${duration === minutes * 60 ? 'is-selected' : ''}`} onClick={() => chooseDuration(minutes)}><span className="font-mono text-sm">{minutes}<span className="ml-1 text-[10px] text-muted-foreground">MIN</span></span></button>)}</div></div><div className="sketch-panel p-5"><div className="flex items-center justify-between"><div className="flex items-center gap-3"><span className="panel-icon"><Headphones /></span><div><p className="eyebrow">presence sound</p><p className="mt-1 text-sm">One click per second</p></div></div><button className="ghost-button" onClick={() => setSoundOn(!soundOn)} aria-label={soundOn ? 'Turn sound off' : 'Turn sound on'}>{soundOn ? <Volume2 /> : <VolumeX />}</button></div><div className="mt-5 flex flex-col gap-2">{sounds.map((sound) => <button key={sound.id} className={`sound-option ${soundId === sound.id ? 'is-selected' : ''}`} onClick={() => setSoundId(sound.id)}><span>{sound.name}</span><span className="text-xs text-muted-foreground">{sound.detail}</span></button>)}</div><div className="mt-5 flex items-center gap-3"><VolumeX className="text-muted-foreground" /><input aria-label="Sound volume" type="range" min="0" max="100" value={volume} onChange={(event) => setVolume(Number(event.target.value))} /><Volume2 className="text-muted-foreground" /><button className="test-button" onClick={playClick}>test</button></div></div>{process.env.NODE_ENV === 'production' && <section className="ad-zone" aria-label="Advertisement"><span className="eyebrow">support independent focus tools</span><Script id="hilltopads-zone" strategy="afterInteractive">{`(function(wjsu){
-var d = document,
-    s = d.createElement('script'),
-    l = d.scripts[d.scripts.length - 1];
-s.settings = wjsu || {};
-s.src = "//unfoldedtrade.com/bQX.VvsYdnGYlQ0nY/WUcx/AeLmF9cumZjU/lSkfPaTrc/z/N/zVcvzJMpjdEPtONUzxMy3GNgzuMuy/NIQE";
-s.async = true;
-s.referrerPolicy = 'no-referrer-when-downgrade';
-l.parentNode.insertBefore(s, l);
-})({})`}</Script></section>}</aside>
+          <aside className="flex flex-col gap-6"><div><p className="eyebrow">session length</p><div className="mt-4 grid grid-cols-3 gap-2">{durations.map((minutes) => <button key={minutes} className={`mode-option justify-center ${duration === minutes * 60 ? 'is-selected' : ''}`} onClick={() => chooseDuration(minutes)}><span className="font-mono text-sm">{minutes}<span className="ml-1 text-[10px] text-muted-foreground">MIN</span></span></button>)}</div></div><div className="sketch-panel p-5"><div className="flex items-center justify-between"><div className="flex items-center gap-3"><span className="panel-icon"><Headphones /></span><div><p className="eyebrow">presence sound</p><p className="mt-1 text-sm">One click per second</p></div></div><button className="ghost-button" onClick={() => setSoundOn(!soundOn)} aria-label={soundOn ? 'Turn sound off' : 'Turn sound on'}>{soundOn ? <Volume2 /> : <VolumeX />}</button></div><div className="mt-5 flex flex-col gap-2">{sounds.map((sound) => <button key={sound.id} className={`sound-option ${soundId === sound.id ? 'is-selected' : ''}`} onClick={() => setSoundId(sound.id)}><span>{sound.name}</span><span className="text-xs text-muted-foreground">{sound.detail}</span></button>)}</div><div className="mt-5 flex items-center gap-3"><VolumeX className="text-muted-foreground" /><input aria-label="Sound volume" type="range" min="0" max="100" value={volume} onChange={(event) => setVolume(Number(event.target.value))} /><Volume2 className="text-muted-foreground" /><button className="test-button" onClick={playClick}>test</button></div></div><section className="ad-zone" aria-label="Advertisement"><span className="eyebrow">support independent focus tools</span><HilltopAdZone /></section></aside>
         </section>
 
         <section className="grid gap-8 border-t border-border/70 pt-7 lg:grid-cols-[1fr_1.4fr]"><div><p className="eyebrow">{mode === 'goal' ? 'your single goal' : 'write before you begin'}</p><div className="mt-3 flex flex-col gap-3">{mode === 'goal' ? <input className="sketch-input text-lg" placeholder="What deserves your attention?" value={goal} onChange={(event) => setGoal(event.target.value)} /> : <p className="max-w-md font-serif text-2xl leading-tight text-muted-foreground">“Attention is the rarest and purest form of generosity.”</p>}{mode === 'goal' && tasks.map((task, index) => <div key={index} className="flex items-center gap-2"><button className="task-check" aria-label={`Complete subtask ${index + 1}`}><Check /></button><input className="sketch-input flex-1 text-sm" placeholder={`Subtask ${index + 1}`} value={task} onChange={(event) => setTasks(tasks.map((value, i) => i === index ? event.target.value : value))} /></div>)}</div></div><div className="spotify-card"><div className="flex items-center justify-between gap-4"><div><p className="eyebrow">soundtrack</p><h3 className="mt-1 font-serif text-2xl">Your focus playlist</h3></div><button className="ghost-button" onClick={() => setSpotifyOpen(!spotifyOpen)} aria-expanded={spotifyOpen} aria-label={spotifyOpen ? 'Close playlist' : 'Open playlist'}>{spotifyOpen ? <X /> : <ChevronDown />}</button></div>{spotifyOpen && <iframe className="mt-5 w-full" style={{ borderRadius: 12 }} src="https://open.spotify.com/embed/playlist/2CEufyqJgDa8sD0MhN505g?utm_source=generator&si=11288cd285ef4620" height="352" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" tabIndex={-1} onLoad={(event) => event.currentTarget.blur()} title="Focus playlist on Spotify" />}{!spotifyOpen && <button className="spotify-open mt-5" onClick={() => setSpotifyOpen(true)}><Play data-icon="inline-start" /> play playlist <ExternalLink data-icon="inline-end" /></button>}</div></section>

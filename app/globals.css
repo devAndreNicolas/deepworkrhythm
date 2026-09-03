@@ -22,7 +22,7 @@ button { cursor: pointer; }
 .ad-slot { display: block; width: 100%; min-height: 90px; max-height: 160px; border: 0; overflow: hidden; }
 .sketch-panel::after, .spotify-card::after { content: ''; pointer-events: none; position: absolute; inset: 4px; border: 1px dashed oklch(.5 .05 140 / .13); border-radius: inherit; }
 .hero-panel { background: linear-gradient(135deg, color-mix(in oklch, var(--card) 94%, transparent), color-mix(in oklch, var(--background) 30%, var(--card))); }
-.logo-mark { display: flex; gap: 3px; align-items: end; height: 25px; transform: rotate(-8deg); }
+.logo-image { width: 34px; height: 34px; border-radius: 8px 5px 7px 4px; object-fit: cover; box-shadow: 2px 2px 0 oklch(.25 .03 140 / .45); }\n.logo-mark { display: flex; gap: 3px; align-items: end; height: 25px; transform: rotate(-8deg); }
 .logo-mark span { width: 5px; background: var(--primary); border-radius: 4px; display: block; }.logo-mark span:nth-child(1){height:14px}.logo-mark span:nth-child(2){height:24px}.logo-mark span:nth-child(3){height:18px}
 .eyebrow { color: var(--muted-foreground); font: 500 10px/1.2 'IBM Plex Mono', monospace; letter-spacing: .18em; text-transform: uppercase; }
 .scribble-label { border-bottom: 1px solid var(--accent); color: var(--accent); font: 11px 'IBM Plex Mono', monospace; transform: rotate(-3deg); padding: 3px; }

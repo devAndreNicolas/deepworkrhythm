@@ -17,23 +17,33 @@ function FocusGarden() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [score, setScore] = useState(0)
   const [planted, setPlanted] = useState(0)
+  const [target, setTarget] = useState(3)
   const [complete, setComplete] = useState(false)
-  const gameRef = useRef({ x: 0, y: 0, seeds: [{ x: .25, y: .38 }, { x: .7, y: .3 }, { x: .48, y: .68 }], flowers: [] as { x: number, y: number }[] })
-
-  const reset = useCallback(() => { gameRef.current.seeds = [{ x: .25, y: .38 }, { x: .7, y: .3 }, { x: .48, y: .68 }]; gameRef.current.flowers = []; setScore(0); setPlanted(0); setComplete(false) }, [])
+  const targetRef = useRef(3)
+  const plantAudioRef = useRef<AudioContext | null>(null)
+  const gameRef = useRef({ x: 0, y: 0, seeds: [] as { x: number, y: number, phase: number }[], flowers: [] as { x: number, y: number, born: number }[], particles: [] as { x: number, y: number, life: number }[] })
+  const makeSeeds = useCallback((count: number) => Array.from({ length: count }, (_, i) => ({ x: .12 + ((i * 37) % 76) / 100, y: .18 + ((i * 61) % 64) / 100, phase: i * .9 })), [])
+  const reset = useCallback(() => { const count = gameRef.current.seeds.length || target; gameRef.current.seeds = makeSeeds(count); gameRef.current.flowers = []; gameRef.current.particles = []; setScore(0); setPlanted(0); setComplete(false) }, [makeSeeds, target])
   useEffect(() => {
     const canvas = canvasRef.current; if (!canvas) return
     const ctx = canvas.getContext('2d'); if (!ctx) return
+    const stored = Number(window.sessionStorage.getItem('focus-garden-rounds') || '0') + 1
+    window.sessionStorage.setItem('focus-garden-rounds', String(stored))
+    const count = Math.min(3 + Math.floor((stored - 1) / 2), 12)
+    targetRef.current = count; setTarget(count); gameRef.current.seeds = makeSeeds(count)
     const resize = () => { const box = canvas.getBoundingClientRect(), ratio = window.devicePixelRatio || 1; canvas.width = box.width * ratio; canvas.height = box.height * ratio; ctx.setTransform(ratio, 0, 0, ratio, 0, 0) }
-    const draw = () => { const w = canvas.clientWidth, h = canvas.clientHeight, g = gameRef.current; ctx.clearRect(0, 0, w, h); ctx.fillStyle = '#10251c'; ctx.fillRect(0, 0, w, h)
-      ctx.strokeStyle = 'rgba(224,177,52,.17)'; ctx.lineWidth = 1; for (let y = 20; y < h; y += 18) { ctx.beginPath(); ctx.moveTo(0, y); ctx.quadraticCurveTo(w/2, y + 6, w, y); ctx.stroke() }
-      g.flowers.forEach(p => { const x=p.x*w,y=p.y*h; ctx.strokeStyle='#e0b134'; ctx.beginPath(); ctx.moveTo(x,y+14);ctx.lineTo(x,y);ctx.stroke();ctx.fillStyle='#e0b134';ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#f1e7c8';ctx.beginPath();ctx.arc(x-5,y,3,0,Math.PI*2);ctx.arc(x+5,y,3,0,Math.PI*2);ctx.fill() })
-      g.seeds.forEach(p => { const x=p.x*w,y=p.y*h; ctx.fillStyle='#d8a92e'; ctx.beginPath(); ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#f1e7c8';ctx.stroke() })
-      if (!g.x) { g.x=w*.5;g.y=h*.5 } ctx.strokeStyle='#f1e7c8';ctx.lineWidth=2;ctx.beginPath();ctx.arc(g.x,g.y,10,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(g.x-15,g.y);ctx.lineTo(g.x+15,g.y);ctx.moveTo(g.x,g.y-15);ctx.lineTo(g.x,g.y+15);ctx.stroke(); requestAnimationFrame(draw) }
-    const move = (e: PointerEvent) => { const r=canvas.getBoundingClientRect(); gameRef.current.x=e.clientX-r.left;gameRef.current.y=e.clientY-r.top; const g=gameRef.current; const hit=g.seeds.findIndex(p=>Math.hypot(p.x*canvas.clientWidth-g.x,p.y*canvas.clientHeight-g.y)<22); if(hit>-1){g.seeds.splice(hit,1);g.flowers.push({x:g.x/canvas.clientWidth,y:g.y/canvas.clientHeight});setScore(s=>s+10);setPlanted(g.flowers.length);if(g.flowers.length===3)setComplete(true)} }
-    resize(); window.addEventListener('resize',resize); canvas.addEventListener('pointermove',move); const id=requestAnimationFrame(draw); return()=>{cancelAnimationFrame(id);window.removeEventListener('resize',resize);canvas.removeEventListener('pointermove',move)}
-  }, [])
-  return <div className="garden-game"><div className="flex items-center justify-between"><div><p className="eyebrow">focus garden</p><p className="mt-1 text-sm text-foreground">Plant three flowers before your break ends.</p></div><span className="game-score">{score.toString().padStart(2,'0')} pts</span></div><canvas ref={canvasRef} aria-label="Focus Garden: move your pointer to collect seeds and plant flowers" /><div className="flex items-center justify-between gap-3"><p className="font-mono text-[10px] uppercase tracking-[.14em] text-muted-foreground">Move the crosshair over each seed · {planted}/3 planted</p><button className="test-button" onClick={reset}><RotateCcw data-icon="inline-start" /> restart garden</button></div>{complete && <p className="game-complete">Garden complete. Take your time returning to the work.</p>}</div>
+    let frame = 0
+    const draw = (time: number) => { const w = canvas.clientWidth, h = canvas.clientHeight, g = gameRef.current; ctx.clearRect(0, 0, w, h); ctx.fillStyle = '#10251c'; ctx.fillRect(0, 0, w, h)
+      ctx.fillStyle = 'rgba(224,177,52,.06)'; ctx.beginPath(); ctx.arc(w*.18,h*.18,w*.2,0,Math.PI*2); ctx.arc(w*.82,h*.72,w*.28,0,Math.PI*2); ctx.fill()
+      ctx.strokeStyle = 'rgba(224,177,52,.12)'; ctx.lineWidth = 1; for (let y = 20; y < h; y += 18) { ctx.beginPath(); ctx.moveTo(0, y); ctx.quadraticCurveTo(w/2, y + 6, w, y); ctx.stroke() }
+      g.flowers.forEach(p => { const x=p.x*w,y=p.y*h, growth=Math.min(1,(time-p.born)/700); ctx.save();ctx.translate(x,y);ctx.scale(growth,growth);ctx.strokeStyle='#8abf78';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,16);ctx.quadraticCurveTo(-2,5,0,0);ctx.stroke();ctx.fillStyle='#d8a92e';ctx.beginPath();ctx.arc(0,0,6,0,Math.PI*2);ctx.fill();ctx.fillStyle='#f1e7c8';ctx.beginPath();ctx.arc(-6,0,3,0,Math.PI*2);ctx.arc(6,0,3,0,Math.PI*2);ctx.fill();ctx.restore() })
+      g.seeds.forEach(p => { const x=p.x*w,y=p.y*h, pulse=1+Math.sin(time/500+p.phase)*.12; ctx.fillStyle='#d8a92e';ctx.beginPath();ctx.arc(x,y,7*pulse,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#f1e7c8';ctx.stroke() })
+      g.particles = g.particles.filter(p => p.life > 0); g.particles.forEach(p => { p.life -= 16; ctx.fillStyle=`rgba(224,177,52,${p.life/500})`;ctx.beginPath();ctx.arc(p.x*w,p.y*h,2,0,Math.PI*2);ctx.fill() })
+      if (!g.x) { g.x=w*.5;g.y=h*.5 } ctx.strokeStyle='#f1e7c8';ctx.lineWidth=2;ctx.beginPath();ctx.arc(g.x,g.y,10,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(g.x-15,g.y);ctx.lineTo(g.x+15,g.y);ctx.moveTo(g.x,g.y-15);ctx.lineTo(g.x,g.y+15);ctx.stroke();frame=requestAnimationFrame(draw) }
+    const move = (e: PointerEvent) => { const r=canvas.getBoundingClientRect(); gameRef.current.x=e.clientX-r.left;gameRef.current.y=e.clientY-r.top; const g=gameRef.current; const hit=g.seeds.findIndex(p=>Math.hypot(p.x*canvas.clientWidth-g.x,p.y*canvas.clientHeight-g.y)<24); if(hit>-1){const seed=g.seeds.splice(hit,1)[0];g.flowers.push({x:seed.x,y:seed.y,born:performance.now()});g.particles.push(...Array.from({length:8},()=>({x:seed.x,y:seed.y,life:500})));const C=window.AudioContext||(window as typeof window & {webkitAudioContext?:typeof AudioContext}).webkitAudioContext;if(C){const c=plantAudioRef.current??new C();plantAudioRef.current=c;const o=c.createOscillator(),gain=c.createGain();o.type='sine';o.frequency.setValueAtTime(420,c.currentTime);o.frequency.exponentialRampToValueAtTime(760,c.currentTime+.16);gain.gain.setValueAtTime(.045,c.currentTime);gain.gain.exponentialRampToValueAtTime(.001,c.currentTime+.24);o.connect(gain).connect(c.destination);o.start();o.stop(c.currentTime+.25)}setScore(s=>s+10);setPlanted(g.flowers.length);if(g.flowers.length===targetRef.current)setComplete(true)} }
+    resize(); window.addEventListener('resize',resize); canvas.addEventListener('pointermove',move); frame=requestAnimationFrame(draw); return()=>{cancelAnimationFrame(frame);window.removeEventListener('resize',resize);canvas.removeEventListener('pointermove',move)}
+  }, [makeSeeds, target])
+  return <div className="garden-game"><div className="flex items-center justify-between"><div><p className="eyebrow">focus garden</p><p className="mt-1 text-sm text-foreground">Plant a quiet garden while you rest.</p></div><span className="game-score">{score.toString().padStart(2,'0')} pts</span></div><canvas ref={canvasRef} aria-label="Focus Garden: move your pointer over each seed to plant a flower" /><div className="flex items-center justify-between gap-3"><p className="font-mono text-[10px] uppercase tracking-[.14em] text-muted-foreground">Move gently over each seed · {planted}/{target} planted</p><button className="test-button" onClick={reset}><RotateCcw data-icon="inline-start" /> grow again</button></div>{complete && <p className="game-complete">Garden complete. Let the quiet stay with you.</p>}</div>
 }
 
 export default function Page() {
